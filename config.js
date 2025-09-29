@@ -197,7 +197,9 @@ var config = {
                 { layer: 'lines', opacity: 0 },
                 { layer: 'polygons', opacity: 10 }
             ],
-            onChapterExit: []
+            onChapterExit: [
+                { layer: '3Dplygon', opacity: 1}
+            ]
         },
 
         {
@@ -209,7 +211,7 @@ var config = {
             description: '',
             location: {
                 center: [-82.47019, 9.36498],
-                zoom: 10,
+                zoom: 5,
                 pitch: 75,
                 bearing: 100
             },

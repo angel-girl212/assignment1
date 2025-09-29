@@ -218,7 +218,7 @@ var config = {
             description: 'Look guys! We have a 3d dataset',
             location: {
                 center: [-82.47019, 9.36498],
-                zoom: 6,
+                zoom: 5,
                 pitch: 75,
                 bearing: 100
             },
@@ -227,10 +227,10 @@ var config = {
             callback: '',
             onChapterEnter: [
                 { layer: '3dpolygon', opacity: 1},
-                { layer: 'points', opacity:  1 },
-                { layer: 'points2', opacity: 1 },
+                { layer: 'points', opacity:  0 },
+                { layer: 'points2', opacity: 0 },
                 { layer: 'lines', opacity: 0 },
-                { layer: 'polygons', opacity: 1 }
+                { layer: 'polygons', opacity: 0 }
             ],
             onChapterExit: []
         },
@@ -243,7 +243,7 @@ var config = {
             image: '',
             description: '',
             location: {
-                center: [-79.81038, 9.12788],
+                center: [-82.47019, 9.36498],
                 zoom: 12,
                 pitch: 75,
                 bearing: 100
@@ -256,7 +256,7 @@ var config = {
                 { layer: 'points', opacity:  1 },
                 { layer: 'points2', opacity: 1 },
                 { layer: 'lines', opacity: 0 },
-                { layer: 'polygons', opacity: 1 }
+                { layer: 'polygons', opacity: 0 }
             ],
             onChapterExit: []
         }

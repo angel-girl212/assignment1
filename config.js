@@ -233,7 +233,8 @@ var config = {
                 { layer: 'polygons', opacity: 1 }
             ],
             onChapterExit: []
-        }
+        },
+        
         {
             id: '3Dmore',
             alignment: 'middle',

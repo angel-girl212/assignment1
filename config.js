@@ -198,11 +198,11 @@ var config = {
             rotateAnimation: false,
             callback: '',
             onChapterEnter: [
+                { layer: '3dpolygon', opacity: 0},
                 { layer: 'points', opacity:  1 },
                 { layer: 'points2', opacity: 1 },
                 { layer: 'lines', opacity: 0 },
-                { layer: 'polygons', opacity: 0 },
-                { layer: '3dpolygon', opacity: 0}
+                { layer: 'polygons', opacity: 1 }
             ],
             onChapterExit: [
                 { layer: '3dpolygon', opacity: 1}
@@ -215,10 +215,10 @@ var config = {
             hidden: false,
             title: '3D dataset',
             image: '',
-            description: '',
+            description: 'Look guys! We have a 3d dataset',
             location: {
                 center: [-82.47019, 9.36498],
-                zoom: 3,
+                zoom: 6,
                 pitch: 75,
                 bearing: 100
             },
@@ -226,11 +226,36 @@ var config = {
             rotateAnimation: true,
             callback: '',
             onChapterEnter: [
+                { layer: '3dpolygon', opacity: 1},
                 { layer: 'points', opacity:  1 },
                 { layer: 'points2', opacity: 1 },
                 { layer: 'lines', opacity: 0 },
-                { layer: 'polygons', opacity: 1 },
-                { layer: '3dpolygon', opacity: 1}
+                { layer: 'polygons', opacity: 1 }
+            ],
+            onChapterExit: []
+        }
+        {
+            id: '3Dmore',
+            alignment: 'middle',
+            hidden: false,
+            title: '3D dataset further info - population etc',
+            image: '',
+            description: '',
+            location: {
+                center: [-79.81038, 9.12788],
+                zoom: 12,
+                pitch: 75,
+                bearing: 100
+            },
+            mapAnimation: 'flyTo',
+            rotateAnimation: true,
+            callback: '',
+            onChapterEnter: [
+                { layer: '3dpolygon', opacity: 1},
+                { layer: 'points', opacity:  1 },
+                { layer: 'points2', opacity: 1 },
+                { layer: 'lines', opacity: 0 },
+                { layer: 'polygons', opacity: 1 }
             ],
             onChapterExit: []
         }

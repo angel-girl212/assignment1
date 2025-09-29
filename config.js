@@ -209,7 +209,7 @@ var config = {
             description: '',
             location: {
                 center: [-82.47019, 9.36498],
-                zoom: 5,
+                zoom: 10,
                 pitch: 75,
                 bearing: 100
             },
@@ -220,7 +220,8 @@ var config = {
                 { layer: 'points', opacity:  1 },
                 { layer: 'points2', opacity: 1 },
                 { layer: 'lines', opacity: 0 },
-                { layer: 'polygons', opacity: 10 }
+                { layer: 'polygons', opacity: 1 },
+                { layer: '3Dplygon', opacity: 1}
             ],
             onChapterExit: []
         }

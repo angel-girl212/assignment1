@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!--GEOG 384 Assignment #1 2025 branchout: Bat Simulator-->
+<!--Code from Mapbox "Animate a Camera along a Path" https://docs.mapbox.com/mapbox-gl-js/example/free-camera-path/-->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bat simulator!</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<script src="https://docs.mapbox.com/mapbox-gl-js/assets/routes.js"></script>
+<script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+<script>
+	// TO MAKE THE MAP APPEAR YOU MUST
+	// ADD YOUR ACCESS TOKEN FROM
+	// https://account.mapbox.com
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYW5nbGUta3ByIiwiYSI6ImNtZjJybG10YzFkbnUycG80N3J5cDVid2QifQ.SoIeeUn_3CNLmzU2cgtv1w'; // my access token
+    const map = new mapboxgl.Map({
+        container: 'map',
+        zoom: 15,
+        center: [-82.296839, 9.397306], // mainland starting flight point of Bat Neo
+        pitch: 80, // took a lot of experimentation to find the correct orientation and angle. found these two values after trial and error
+        bearing: 100,
+        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        style: 'mapbox://styles/angle-kpr/cmg5e5kso003e01qice4udbky', // my style
+        interactive: false
+    });
+
+    // this is the path the camera will look at	
+    // coordinates from point layer (74ED7.geojson) visualizing the Bat Neo flight path from 2:07am to 5:24am
+    const targetRoute =  [
+        [-82.488895, 9.419474],
+        [-82.486416, 9.418017],
+        [-82.490238, 9.420544],
+        [-82.490009, 9.42013],
+        [-82.482977, 9.417441],
+        [-82.477448, 9.415796],
+        [-82.472046, 9.413609],
+        [-82.466973, 9.412173],
+        [-82.462022, 9.410857],
+        [-82.45701, 9.409581],
+        [-82.452069, 9.407899],
+        [-82.446666, 9.407039],
+        [-82.441096, 9.405962],
+        [-82.435621, 9.404787],
+        [-82.430434, 9.403515],
+        [-82.425183, 9.401958],
+        [-82.420102, 9.400613],
+        [-82.415205, 9.399506],
+        [-82.410361, 9.399205],
+        [-82.405458, 9.398622],
+        [-82.400458, 9.398034],
+        [-82.39555, 9.397718],
+        [-82.390507, 9.39766],
+        [-82.385704, 9.397502],
+        [-82.380462, 9.39759],
+        [-82.375287, 9.397707],
+        [-82.371223, 9.397486],
+        [-82.366027, 9.397742],
+        [-82.361095, 9.398263],
+        [-82.355655, 9.397776],
+        [-82.349613, 9.397764],
+        [-82.343432, 9.398201],
+        [-82.337499, 9.40003],
+        [-82.331343, 9.40151],
+        [-82.325316, 9.403059],
+        [-82.319703, 9.402651],
+        [-82.314171, 9.4028],
+        [-82.309467, 9.401925],
+        [-82.305582, 9.400448],
+        [-82.301269, 9.399148],
+        [-82.296839, 9.397306],
+        [-82.293185, 9.39472],
+        [-82.290129, 9.39293],
+        [-82.28637, 9.391869],
+        [-82.283938, 9.389701],
+        [-82.280343, 9.388451],
+        [-82.277376, 9.389186],
+        [-82.27691, 9.389491],
+        [-82.275209, 9.390416],
+        [-82.273135, 9.393838],
+        [-82.273135, 9.393838]
+      ] 
+
+    // add terrain, sky, and line layers once the style has loaded
+    map.on('style.load', () => {
+        map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 512,
+            'maxzoom': 14
+        });
+        // trace the individual coordinate points into a cohesive LineString for the camera to follow
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+        map.addSource('trace', {
+            type: 'geojson',
+            data: {
+                'type': 'Feature', // feature class
+                'properties': {},
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': targetRoute // bat neo flight
+                }
+            }
+        });
+	// add the line feature class to the map
+        map.addLayer({
+            type: 'line',
+            source: 'trace',
+            id: 'line',
+            paint: {
+                'line-color': '#ff79d9', // same colour pink as the points
+                'line-width': 2 // thin line
+            },
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round'
+            }
+        });
+    });
+
+    // wait for the terrain and sky to load before starting animation
+    map.on('load', () => {
+        const animationDuration = 20000; // a leisurely pace
+        const cameraAltitude = 800; // just above the clouds
+        // get the overall distance of each route so we can interpolate along them
+        const routeDistance = turf.lineDistance(turf.lineString(targetRoute)); // function to calculate route distance inclusionary of coordinate points
+        const cameraRouteDistance = turf.lineDistance(
+            turf.lineString(targetRoute) // the camera follows the line feature along the flight path coord points
+        );
+
+        let start;
+
+        function frame(time) {
+            if (!start) start = time;
+            // phase determines how far through the animation we are
+            const phase = (time - start) / animationDuration;
+
+            // phase is normalized between 0 and 1
+            // when the animation is finished, reset start to loop the animation
+            if (phase > 1) {
+                // wait 1.5 seconds before looping
+                setTimeout(() => {
+                    start = 0.0;
+                }, 1500);
+            }
+
+            // use the phase to get a point that is the appropriate distance along the route
+            // this approach syncs the camera and route positions ensuring they move
+            // at roughly equal rates even if they don't contain the same number of points
+            const alongRoute = turf.along(
+                turf.lineString(targetRoute),
+                routeDistance * phase
+            ).geometry.coordinates;
+
+            const alongCamera = turf.along(
+                turf.lineString(targetRoute),
+                cameraRouteDistance * phase
+            ).geometry.coordinates;
+
+            const camera = map.getFreeCameraOptions();
+
+            // set the position and altitude of the camera
+            camera.position = mapboxgl.MercatorCoordinate.fromLngLat(
+                {
+                    lng: alongCamera[0],
+                    lat: alongCamera[1]
+                },
+                cameraAltitude
+            );
+
+            // tell the camera to look at a point along the route
+            camera.lookAtPoint({
+                lng: alongRoute[0],
+                lat: alongRoute[1]
+            });
+
+            map.setFreeCameraOptions(camera);
+
+            window.requestAnimationFrame(frame);
+        }
+
+        window.requestAnimationFrame(frame);
+    });
+</script>
+
+</body>
+<script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'p3plzcpnl509615'},{'dcenter':'p3'},{'cp_id':'10541863'},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>
